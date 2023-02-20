@@ -1,0 +1,5 @@
+/reference/Password-Manager/
+/venv/
+/PasswordManager/__pycache__/
+/PasswordManager/*.pm
+/PasswordManager/temp.py
