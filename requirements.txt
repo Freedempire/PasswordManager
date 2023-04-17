@@ -1,0 +1,2 @@
+cryptography==40.0.1
+snowflake-id==0.0.2

@@ -1,0 +1,77 @@
+# Tips
+
+## DPI scaling be enabled/disabled
+
+```Python
+ import ctypes
+
+  # Query DPI Awareness (Windows 10 and 8)
+  awareness = ctypes.c_int()
+  errorCode = ctypes.windll.shcore.GetProcessDpiAwareness(0, ctypes.byref(awareness))
+  print(awareness.value)
+
+  # Set DPI Awareness  (Windows 10 and 8)
+  errorCode = ctypes.windll.shcore.SetProcessDpiAwareness(2)
+  # the argument is the awareness level, which can be 0, 1 or 2:
+  # for 1-to-1 pixel control I seem to need it to be non-zero (I'm using level 2)
+
+  # Set DPI Awareness  (Windows 7 and Vista)
+  success = ctypes.windll.user32.SetProcessDPIAware()
+  # behaviour on later OSes is undefined, although when I run it on my Windows 10 machine, it seems to work with effects identical to SetProcessDpiAwareness(1)
+```
+
+The awareness levels are defined as follows:
+
+```C
+typedef enum _PROCESS_DPI_AWARENESS { 
+    PROCESS_DPI_UNAWARE = 0,
+    /*  DPI unaware. This app does not scale for DPI changes and is
+        always assumed to have a scale factor of 100% (96 DPI). It
+        will be automatically scaled by the system on any other DPI
+        setting. */
+
+    PROCESS_SYSTEM_DPI_AWARE = 1,
+    /*  System DPI aware. This app does not scale for DPI changes.
+        It will query for the DPI once and use that value for the
+        lifetime of the app. If the DPI changes, the app will not
+        adjust to the new DPI value. It will be automatically scaled
+        up or down by the system when the DPI changes from the system
+        value. */
+
+    PROCESS_PER_MONITOR_DPI_AWARE = 2
+    /*  Per monitor DPI aware. This app checks for the DPI when it is
+        created and adjusts the scale factor whenever the DPI changes.
+        These applications are not automatically scaled by the system. */
+} PROCESS_DPI_AWARENESS;
+```
+
+Level 2 sounds most appropriate for my goal although `1` will also work provided there's no change in system resolution / DPI scaling.
+
+`SetProcessDpiAwareness` will fail with `errorCode = -2147024891 = 0x80070005 = E_ACCESSDENIED` if it has previously been called for the current process (and that includes being called by the system when the process is launched, due to a registry key or .manifest file)
+
+## tkinter.filedialog
+
+选择文件对话框的格式：
+`tkinter.filedialog.asksaveasfilename()`：选择以什么文件名保存，返回文件名
+`tkinter.filedialog.asksaveasfile()`：选择以什么文件保存，创建文件并返回文件流对象
+`tkinter.filedialog.askopenfilename()`：选择打开什么文件，返回文件名
+`tkinter.filedialog.askopenfile()`：选择打开什么文件，返回IO流对象
+`tkinter.filedialog.askdirectory()`：选择目录，返回目录名
+`tkinter.filedialog.askopenfilenames()`：选择打开多个文件，以元组形式返回多个文件名
+`tkinter.filedialog.askopenfiles()`：选择打开多个文件，以列表形式返回多个IO流对象
+
+```Python
+from tkinter import *
+from tkinter import filedialog
+
+
+def callback():
+    filename = filedialog.askopenfilename(filetypes=(("PNG",".png"),("GPF",".gpf"),("JPG",".jpg"),("python",".py")))
+    print(filename)
+    
+
+root=Tk()
+Button(root, text="Openfile",command=callback).pack()
+root.mainloop()
+```
+

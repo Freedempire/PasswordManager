@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <div id="content_views" class="markdown_views prism-atom-one-light">
+        <svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+            <path stroke-linecap="round" d="M5,0 0,2.5 5,5z" id="raphael-marker-block" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0);"></path>
+        </svg>
+        <p></p>
+<div class="toc">
+<h3><a name="t0"></a>文章目录</h3>
+<ul><li><ul><li><a href="#_2" target="_self">密码哈希是什么？</a></li><li><a href="#_28" target="_self">如何破解哈希？</a></li><li><ul><li><ul><li><a href="#1Rainbow_Tables_30" target="_self">1.彩虹表（Rainbow Tables）</a></li><li><a href="#2_Dictionary_and_Brute_Force_Attacks_64" target="_self">2.字典攻击和暴力攻击（ Dictionary and Brute Force Attacks）</a></li><li><a href="#3_Lookup_Tables_83" target="_self">3.查表法（ Lookup Tables）</a></li><li><a href="#4_Reverse_Lookup_Tables_104" target="_self">4.反向查表法（ Reverse Lookup Tables）</a></li><li><a href="#5_Adding_Salt_120" target="_self">5.加盐（ Adding Salt）</a></li></ul>
+</li></ul>
+</li></ul>
+</li></ul>
+</div>
+<p></p> 
+<h2><a name="t1"></a><a id="_2"></a>密码哈希是什么？</h2> 
+<pre data-index="0" class="prettyprint"><code class="prism language-java has-numbering" onclick="mdcp.signin(event)" style="position: unset;"><span class="token function">hash</span><span class="token punctuation">(</span><span class="token string">"hello"</span><span class="token punctuation">)</span> <span class="token operator">=</span> <span class="token number">2</span>cf24dba5fb0a30e26e83b2ac5b9e29e1b161e5c1fa7425e73043362938b9824
+<span class="token function">hash</span><span class="token punctuation">(</span><span class="token string">"hbllo"</span><span class="token punctuation">)</span> <span class="token operator">=</span> <span class="token number">58756879</span>c05c68dfac9866712fad6a93f8146f337a69afe7dd238f3364946366
+<span class="token function">hash</span><span class="token punctuation">(</span><span class="token string">"waltz"</span><span class="token punctuation">)</span> <span class="token operator">=</span> c0e81794384491161f1777c232bc6bd9ec38f616560b120fda8e90f383853542
+<div class="hljs-button signin" data-title="登录后复制" data-report-click="{&quot;spm&quot;:&quot;1001.2101.3001.4334&quot;}"></div></code><ul class="pre-numbering" style=""><li style="color: rgb(153, 153, 153);">1</li><li style="color: rgb(153, 153, 153);">2</li><li style="color: rgb(153, 153, 153);">3</li></ul></pre> 
+<p>  <a href="https://so.csdn.net/so/search?q=%E5%93%88%E5%B8%8C%E7%AE%97%E6%B3%95&amp;spm=1001.2101.3001.7020" target="_blank" class="hl hl-1" data-report-click="{&quot;spm&quot;:&quot;1001.2101.3001.7020&quot;,&quot;dest&quot;:&quot;https://so.csdn.net/so/search?q=%E5%93%88%E5%B8%8C%E7%AE%97%E6%B3%95&amp;spm=1001.2101.3001.7020&quot;,&quot;extra&quot;:&quot;{\&quot;searchword\&quot;:\&quot;哈希算法\&quot;}&quot;}" data-tit="哈希算法" data-pretit="哈希算法">哈希算法</a>是一种单向函数。它把任意数量的数据转换为固定长度的“指纹”，而且这个过程无法逆转。它们有这样的特性：如果输入发生了一点改变，由此产生的哈希值会完全不同（参见上面的例子）。这个特性很适合用来存储密码。因为我们需要一种不可逆的算法来加密存储的密码，同时保证我们也能够验证用户登陆的密码是否正确。</p> 
+<p>在基于哈希加密的帐号系统中，用户注册和认证的大致流程如下。</p> 
+<ul><li>用户创建自己的帐号。</li><li>密码经过哈希加密后存储在数据库中。密码一旦写入到磁盘，任何时候都不允许是明文形式。</li><li>当用户试图登录时，系统从数据库取出已经加密的密码，和经过哈希加密的用户输入的密码进行对比。</li><li>如果哈希值相同，用户将被授予访问权限。否则，告知用户他们输入的登陆凭据无效。</li><li>每当有人试图尝试登陆，就重复步骤3和4。</li></ul> 
+<p>  在步骤4中，永远不要告诉用户输错的究竟是用户名还是密码。就像通用的提示那样，始终显示：“无效的用户名或密码。”就行了。这样可以防止攻击者在不知道密码的情况下枚举出有效的用户名。</p> 
+<p>  应当注意的是，用来保护密码的哈希函数，和数据结构课学到的哈希函数是不同的。例如，实现哈希表的哈希函数设计目的是快速查找，而非安全性。只有加密哈希函数（ cryptographic hash function）才可以用来进行密码哈希加密。像 SHA256 、 SHA512 、 RIPEMD 和 WHIRLPOOL 都是加密哈希函数。</p> 
+<p>  人们很容易认为，Web开发人员所做的就是：只需通过执行加密哈希函数就可以让用户密码得以安全。然而并不是这样。有很多方法可以从简单的哈希值中快速恢复出明文的密码。有几种易于实施的技术，使这些“破解”的效率大为降低。网上有这种专门破解MD5的网站，只需提交一个哈希值，不到一秒钟就能得到破解的结果。显然，单纯的对密码进行哈希加密远远达不到我们的安全要求。</p> 
+<p>如果采用HASH算法（包括特殊HASH）</p> 
+<h2><a name="t2"></a><a id="_28"></a>如何破解哈希？</h2> 
+<h4><a id="1Rainbow_Tables_30"></a>1.<a href="https://so.csdn.net/so/search?q=%E5%BD%A9%E8%99%B9%E8%A1%A8&amp;spm=1001.2101.3001.7020" target="_blank" class="hl hl-1" data-report-click="{&quot;spm&quot;:&quot;1001.2101.3001.7020&quot;,&quot;dest&quot;:&quot;https://so.csdn.net/so/search?q=%E5%BD%A9%E8%99%B9%E8%A1%A8&amp;spm=1001.2101.3001.7020&quot;,&quot;extra&quot;:&quot;{\&quot;searchword\&quot;:\&quot;彩虹表\&quot;}&quot;}" data-tit="彩虹表" data-pretit="彩虹表">彩虹表</a>（Rainbow Tables）</h4> 
+<p>  一般使用彩虹表的方式来破解，彩虹表的原理是什么呢？彩虹表是一种以空间换时间的技术。与查表法相似，只是它为了使查询表更小，牺牲了破解速度。因为彩虹表更小，所以在单位空间可以存储更多的哈希值，从而使攻击更有效。能够破解任何最多8位长度的 MD5 值的彩虹表已经出现。</p> 
+<p>  我们先来了解下如何进行HASH碰撞。单向HASH算法由于不能进行解密运算，只能通过建表、查表的方式进行碰撞，即将常用的密码及其对应的HASH值全计算出来并存储，当获取到HASH值是，直接查表获取原始密码，假设用MD5算法来保护6位数字密码，可以建如下表：</p> 
+<div class="table-box"><table><thead><tr><th>原始密码</th><th>MD5值</th></tr></thead><tbody><tr><td>000000</td><td>670B14728AD9902AECBA32E22FA4F6BD</td></tr><tr><td>000001</td><td>04FC711301F3C784D66955D98D399AFB</td></tr><tr><td>…</td><td>…</td></tr><tr><td>999999</td><td>52C69E3A57331081823331C4E69D3F2E</td></tr></tbody></table></div>
+<p>  全表共100W条记录，因为数据量不大，这种情况建表、查表都非常容易。但是当密码并不是6位纯数字密码，而是数字、大小写字母结合的10位密码时，建立一个这样的表需要（26+26+10）^ 10 ≈ 83亿亿（条记录），存储在硬盘上至少要占用2000W TB的空间，这么大的存储空间，成本太大，几乎不可行。有什么办法可以减少存储空间？一种方法是“预计算哈希链”，“预计算哈希链”可以大幅减少HASH表的存储空间，但相应的增加了查表时的计算量，其原理大致如下：</p> 
+<p><mark>建表过程：</mark></p> 
+<p><img src="https://img-blog.csdnimg.cn/40fe3b7eb74a450a84dded5bf3cf6ef8.png#pic_center" alt="在这里插入图片描述"></p> 
+<p>  先对原始数据“000000”进行一次HASH运算得到“670B1E”，再对HASH值进行一次R运算，R是一个定制的算法可以将HASH值映射到明文空间上（这里我们的明文空间是000000~999999），R运算后得到“283651”，再对“283651”进行hash运算得到“1A99CD”，然后在进行R运算得到“819287”，如此重复多次，得到一条哈希链。然后再选用其它原始数据建立多条哈希链。最终仅将链头和链尾保存下来，中间节点全都去掉。</p> 
+<p><mark>查表过程：</mark></p> 
+<p>  假设拿到了一条HASH值“670B1E”，首先进行一次R运算，得到了“283651”，查询所有链尾是否有命中，如果没有，则再进行一次HASH、一次R，得到了“819287”，再次所有链尾，可以得到看出已经命中。这样我们就可以基本确认“670B1E”对应的明文就在这条链上，然后我们把这条链的生成过程进行重新计算，计算过程中可以发现“000000”的HASH值就是“670B1E”，这样就完成了整个查表过程。这种表就是“预计算哈希链”。这种方式存在一个问题，多条链之间可能存在大量的重复数据，如下图所示：</p> 
+<p><img src="https://img-blog.csdnimg.cn/86ebd9f0f9874862ace16a9116d119a2.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA56iL5bqPeWFuZw==,size_20,color_FFFFFF,t_70,g_se,x_16#pic_center" alt="在这里插入图片描述"></p> 
+<p>为了解决这个问题，我们将R算法进行扩展，一条链上的多次R运算采用不同的算法,如下图：</p> 
+<p><img src="https://img-blog.csdnimg.cn/f8cecfdb0080444c8fc686eec020a386.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA56iL5bqPeWFuZw==,size_20,color_FFFFFF,t_70,g_se,x_16#pic_center" alt="在这里插入图片描述"></p> 
+<p>一条链上的每个R算法都不一样，就像彩虹的每层颜色一样，因此取名的为彩虹表。</p> 
+<p>  当然彩虹表除了可以用户破解HASH算法外，理论上还可以用于破解对称加密算法，比如DES算法，由于DES算法密钥比较短，建立彩虹表破解是完全可行的；但对于AES算法，由于密钥比较长，建表几乎不可行（需要耗时N亿年）。</p> 
+<h4><a id="2_Dictionary_and_Brute_Force_Attacks_64"></a>2.字典攻击和暴力攻击（ Dictionary and Brute Force Attacks）</h4> 
+<div class="table-box"><table><thead><tr><th>字典攻击</th><th>暴力攻击</th></tr></thead><tbody><tr><td>Trying apple : failed</td><td>Trying aaaa : failed</td></tr><tr><td>Trying blueberry : failed</td><td>Trying blueberry : failed</td></tr><tr><td>Trying justinbeiber : failed</td><td>Trying aaac : failed</td></tr><tr><td>…</td><td>…</td></tr><tr><td>Trying letmein : failed</td><td>Trying acdb : failed</td></tr><tr><td>Trying s3cr3t : success!</td><td>Trying acdc : success!</td></tr></tbody></table></div>
+<p>  破解哈希加密最简单的方法是尝试猜测密码，哈希每个猜测的密码，并对比猜测密码的哈希值是否等于被破解的哈希值。如果相等，则猜中。猜测密码攻击的两种最常见的方法是字典攻击和暴力攻击 。</p> 
+<p>  字典攻击使用包含单词、短语、常用密码和其他可能用做密码的字符串的字典文件。对文件中的每个词都进行哈希加密，将这些哈希值和要破解的密码哈希值比较。如果它们相同，这个词就是密码。字典文件是通过大段文本中提取的单词构成，甚至还包括一些数据库中真实的密码。还可以对字典文件进一步处理以使其更为有效：如单词 “hello” 按网络用语写法转成 “h3110” 。</p> 
+<p>  暴力攻击是对于给定的密码长度，尝试每一种可能的字符组合。这种方式会消耗大量的计算，也是破解哈希加密效率最低的办法，但最终会找出正确的密码。因此密码应该足够长，以至于遍历所有可能的字符组合，耗费的时间太长令人无法承受，从而放弃破解。</p> 
+<p>  目前没有办法来组织字典攻击或暴力攻击。只能想办法让它们变得低效。如果密码哈希系统设计是安全的，破解哈希的唯一方法就是进行字典攻击或暴力攻击遍历每一个哈希值了。</p> 
+<h4><a id="3_Lookup_Tables_83"></a>3.查表法（ Lookup Tables）</h4> 
+<pre data-index="1" class="prettyprint"><code class="prism language-java has-numbering" onclick="mdcp.signin(event)" style="position: unset;"><span class="token class-name">Searching</span><span class="token operator">:</span> <span class="token number">5f</span><span class="token number">4d</span>cc3b5aa765d61d8327deb882cf99<span class="token operator">:</span> <span class="token constant">FOUND</span><span class="token operator">:</span> password5
+<span class="token class-name">Searching</span><span class="token operator">:</span> <span class="token number">6</span>cbe615c106f422d23669b610b564800<span class="token operator">:</span>  not in database
+<span class="token class-name">Searching</span><span class="token operator">:</span> <span class="token number">630</span>bf032efe4507f2c57b280995925a9<span class="token operator">:</span> <span class="token constant">FOUND</span><span class="token operator">:</span> letMEin12 
+<span class="token class-name">Searching</span><span class="token operator">:</span> <span class="token number">386f</span><span class="token number">43f</span>ab5d096a7a66d67c8f213e5ec<span class="token operator">:</span> <span class="token constant">FOUND</span><span class="token operator">:</span> mcd0nalds
+<span class="token class-name">Searching</span><span class="token operator">:</span> d5ec75d5fe70d428685510fae36492d9<span class="token operator">:</span> <span class="token constant">FOUND</span><span class="token operator">:</span> p<span class="token annotation punctuation">@ssw0rd</span><span class="token operator">!</span>
+<div class="hljs-button signin" data-title="登录后复制" data-report-click="{&quot;spm&quot;:&quot;1001.2101.3001.4334&quot;}"></div></code><ul class="pre-numbering" style=""><li style="color: rgb(153, 153, 153);">1</li><li style="color: rgb(153, 153, 153);">2</li><li style="color: rgb(153, 153, 153);">3</li><li style="color: rgb(153, 153, 153);">4</li><li style="color: rgb(153, 153, 153);">5</li></ul></pre> 
+<p>  对于破解相同类型的哈希值，查表法是一种非常高效的方式。主要理念是预先计算（ pre-compute）出密码字典中的每个密码的哈希值，然后把他们相应的密码存储到一个表里。一个设计良好的查询表结构，即使包含了数十亿个哈希值，仍然可以实现每秒钟查询数百次哈希。</p> 
+<p>  如果你想感受查表法的速度有多快，尝试一下用 CrackStation 的 free hash cracker 来破解下面的 SHA256。</p> 
+<pre data-index="2" class="prettyprint"><code class="prism language-java has-numbering" onclick="mdcp.signin(event)" style="position: unset;">c11083b4b0a7743af748c85d343dfee9fbb8b2576c05f3a7f0d632b0926aadfc
+<span class="token number">08</span>eac03b80adc33dc7d8fbe44b7c7b05d3a2c511166bdb43fcb710b03ba919e7
+e4ba5cbd251c98e6cd1c23f126a3b81d8d8328abc95387229850952b3ef9f904
+<span class="token number">5206</span>b8b8a996cf5320cb12ca91c7b790fba9f030408efe83ebb83548dc3007bd
+<div class="hljs-button signin" data-title="登录后复制" data-report-click="{&quot;spm&quot;:&quot;1001.2101.3001.4334&quot;}"></div></code><ul class="pre-numbering" style=""><li style="color: rgb(153, 153, 153);">1</li><li style="color: rgb(153, 153, 153);">2</li><li style="color: rgb(153, 153, 153);">3</li><li style="color: rgb(153, 153, 153);">4</li></ul></pre> 
+<h4><a id="4_Reverse_Lookup_Tables_104"></a>4.反向查表法（ Reverse Lookup Tables）</h4> 
+<pre data-index="3" class="prettyprint"><code class="prism language-java has-numbering" onclick="mdcp.signin(event)" style="position: unset;"><span class="token class-name">Searching</span> <span class="token keyword">for</span> <span class="token function">hash</span><span class="token punctuation">(</span>apple<span class="token punctuation">)</span> in users' hash list<span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>     <span class="token operator">:</span> <span class="token class-name">Matches</span> <span class="token punctuation">[</span>alice3<span class="token punctuation">,</span> <span class="token number">0</span>bob0<span class="token punctuation">,</span> charles8<span class="token punctuation">]</span>
+<span class="token class-name">Searching</span> <span class="token keyword">for</span> <span class="token function">hash</span><span class="token punctuation">(</span>blueberry<span class="token punctuation">)</span> in users' hash list<span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span> <span class="token operator">:</span> <span class="token class-name">Matches</span> <span class="token punctuation">[</span>usr10101<span class="token punctuation">,</span> timmy<span class="token punctuation">,</span> john91<span class="token punctuation">]</span>
+<span class="token class-name">Searching</span> <span class="token keyword">for</span> <span class="token function">hash</span><span class="token punctuation">(</span>letmein<span class="token punctuation">)</span> in users' hash list<span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>   <span class="token operator">:</span> <span class="token class-name">Matches</span> <span class="token punctuation">[</span>wilson10<span class="token punctuation">,</span> dragonslayerX<span class="token punctuation">,</span> joe1984<span class="token punctuation">]</span>
+<span class="token class-name">Searching</span> <span class="token keyword">for</span> <span class="token function">hash</span><span class="token punctuation">(</span>s3cr3t<span class="token punctuation">)</span> in users' hash list<span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>    <span class="token operator">:</span> <span class="token class-name">Matches</span> <span class="token punctuation">[</span>bruce19<span class="token punctuation">,</span> knuth1337<span class="token punctuation">,</span> john87<span class="token punctuation">]</span>
+<span class="token class-name">Searching</span> <span class="token keyword">for</span> <span class="token function">hash</span><span class="token punctuation">(</span>z<span class="token annotation punctuation">@29hjja</span><span class="token punctuation">)</span> in users' hash list<span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>  <span class="token operator">:</span> <span class="token class-name">No</span> users used <span class="token keyword">this</span> password
+<div class="hljs-button signin" data-title="登录后复制" data-report-click="{&quot;spm&quot;:&quot;1001.2101.3001.4334&quot;}"></div></code><ul class="pre-numbering" style=""><li style="color: rgb(153, 153, 153);">1</li><li style="color: rgb(153, 153, 153);">2</li><li style="color: rgb(153, 153, 153);">3</li><li style="color: rgb(153, 153, 153);">4</li><li style="color: rgb(153, 153, 153);">5</li></ul></pre> 
+<p>  这种攻击允许攻击者无需预先计算好查询表的情况下同时对多个哈希值发起字典攻击或暴力攻击。</p> 
+<p>  首先，攻击者从被黑的用户帐号数据库创建一个用户名和对应的密码哈希表，然后，攻击者猜测一系列哈希值并使用该查询表来查找使用此密码的用户。通常许多用户都会使用相同的密码，因此这种攻击方式特别有效。</p> 
+<p>  接下来，我们来看一种谓之“加盐（ salting）”的技术，能够让查表法和彩虹表都失效。</p> 
+<h4><a id="5_Adding_Salt_120"></a>5.加盐（ Adding <a href="https://so.csdn.net/so/search?q=Salt&amp;spm=1001.2101.3001.7020" target="_blank" class="hl hl-1" data-report-view="{&quot;spm&quot;:&quot;1001.2101.3001.7020&quot;,&quot;dest&quot;:&quot;https://so.csdn.net/so/search?q=Salt&amp;spm=1001.2101.3001.7020&quot;,&quot;extra&quot;:&quot;{\&quot;searchword\&quot;:\&quot;Salt\&quot;}&quot;}" data-report-click="{&quot;spm&quot;:&quot;1001.2101.3001.7020&quot;,&quot;dest&quot;:&quot;https://so.csdn.net/so/search?q=Salt&amp;spm=1001.2101.3001.7020&quot;,&quot;extra&quot;:&quot;{\&quot;searchword\&quot;:\&quot;Salt\&quot;}&quot;}" data-tit="Salt" data-pretit="salt">Salt</a>）</h4> 
+<pre data-index="4" class="prettyprint"><code class="prism language-java has-numbering" onclick="mdcp.signin(event)" style="position: unset;"><span class="token function">hash</span><span class="token punctuation">(</span><span class="token string">"hello"</span><span class="token punctuation">)</span>                    <span class="token operator">=</span> <span class="token number">2</span>cf24dba5fb0a30e26e83b2ac5b9e29e1b161e5c1fa7425e73043362938b9824
+<span class="token function">hash</span><span class="token punctuation">(</span><span class="token string">"hello"</span> <span class="token operator">+</span> <span class="token string">"QxLUF1bgIAdeQX"</span><span class="token punctuation">)</span> <span class="token operator">=</span> <span class="token number">9e209040</span>c863f84a31e719795b2577523954739fe5ed3b58a75cff2127075ed1
+<span class="token function">hash</span><span class="token punctuation">(</span><span class="token string">"hello"</span> <span class="token operator">+</span> <span class="token string">"bv5PehSMfV11Cd"</span><span class="token punctuation">)</span> <span class="token operator">=</span> d1d3ec2e6f20fd420d50e2642992841d8338a314b8ea157c9e18477aaef226ab
+<span class="token function">hash</span><span class="token punctuation">(</span><span class="token string">"hello"</span> <span class="token operator">+</span> <span class="token string">"YYLmfY6IehjZMQ"</span><span class="token punctuation">)</span> <span class="token operator">=</span> a49670c3c18b9e079b9cfaf51634f563dc8ae3070db2c4a8544305df1b60f007
+<div class="hljs-button signin" data-title="登录后复制" data-report-click="{&quot;spm&quot;:&quot;1001.2101.3001.4334&quot;}"></div></code><ul class="pre-numbering" style=""><li style="color: rgb(153, 153, 153);">1</li><li style="color: rgb(153, 153, 153);">2</li><li style="color: rgb(153, 153, 153);">3</li><li style="color: rgb(153, 153, 153);">4</li></ul></pre> 
+<p>  查表法和彩虹表只有在所有密码都以完全相同的方式进行哈希加密才有效。如果两个用户有相同的密码，他们将有相同的密码哈希值。我们可以通过“随机化”哈希，当同一个密码哈希两次后，得到的哈希值是不一样的，从而避免了这种攻击。</p> 
+<p>  我们可以通过在密码中加入一段随机字符串再进行哈希加密，这个被加的字符串称之为盐值。如上例所示，这使得相同的密码每次都被加密为完全不同的字符串。我们需要盐值来校验密码是否正确。通常和密码哈希值一同存储在帐号数据库中，或者作为哈希字符串的一部分。</p> 
+<p>  盐值无需加密。由于随机化了哈希值，查表法、反向查表法和彩虹表都会失效。因为攻击者无法事先知道盐值，所以他们就没有办法预先计算查询表或彩虹表。如果每个用户的密码用不同的盐再进行哈希加密，那么反向查表法攻击也将不能奏效。</p> 
+<p><mark><strong>温馨提醒：</strong></mark></p> 
+<p>  采用PBKDF2、bcrypt、scrypt等算法可以有效抵御彩虹表攻击，即使数据泄露，最关键的“用户密码”仍然可以得到有效的保护，黑客无法大批量破解用户密码，从而切断撞库扫号的根源。当然，对于已经泄露的密码，还是需要用户尽快修改密码，不要再使用已泄露的密码。</p>
+    </div>
+</body>
+</html>
