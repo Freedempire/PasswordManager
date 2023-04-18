@@ -20,7 +20,7 @@ The **Password Manager** is a simple windows desktop application that allows use
 
 ## Features
 
-- **Multiple** users can use the app, each with their own password.
+- **Multiple** users can use the app, each with their own password and unique salt.
 - Master password is hashed using **scrypt** and stored in database.
 - Password records are encrypted with unique salt using `Fernet` from `cryptography` package.
 - Records can be easily **searched** and **manipulated**.

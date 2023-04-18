@@ -10,7 +10,7 @@ import base64
 
 def generate_key(master_password: str, salt: Optional[bytes] = None) -> tuple[bytes, bytes]:
     """
-    Generate key from master_password and salt (if already exists in database) for further encryption / decryption.
+    Generate key from master_password and salt (if not already exists in database) for further encryption / decryption.
     :return: a tuple of salt and hash value as the key
     """
     if salt is None:
