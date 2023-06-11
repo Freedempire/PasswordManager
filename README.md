@@ -14,7 +14,7 @@ The **Password Manager** is a simple windows desktop application that allows use
 
 ![login](passwordmanager/img/screenshot%20-%20login.png)
 
-### Password Enties Frame
+### Password Entries Frame
 
 ![passwords](passwordmanager/img/screenshot%20-%20passwords.png)
 
